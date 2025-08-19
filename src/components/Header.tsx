@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs'
 import {
   Search,
   ShoppingCart,
@@ -16,6 +17,7 @@ import {
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [cartCount] = useState(3) // This would come from your cart state
+  const { isSignedIn } = useUser()
 
   return (
     <header className='sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
@@ -85,9 +87,25 @@ export function Header() {
               )}
             </Button>
 
-            <Button variant='ghost' size='icon' className='hidden md:flex'>
-              <User className='h-5 w-5' />
-            </Button>
+            {isSignedIn ? (
+              <div className='flex items-center space-x-2'>
+                <Button variant='ghost' size='sm' asChild>
+                  <a href='/admin'>Admin</a>
+                </Button>
+                <UserButton afterSignOutUrl='/' />
+              </div>
+            ) : (
+              <div className='hidden md:flex items-center space-x-2'>
+                <SignInButton mode='modal'>
+                  <Button variant='ghost' size='sm'>
+                    Sign In
+                  </Button>
+                </SignInButton>
+                <SignUpButton mode='modal'>
+                  <Button size='sm'>Sign Up</Button>
+                </SignUpButton>
+              </div>
+            )}
 
             {/* Mobile Menu Button */}
             <Button
@@ -145,6 +163,22 @@ export function Header() {
               >
                 About
               </a>
+
+              {/* Mobile Authentication */}
+              {!isSignedIn && (
+                <div className='pt-4 border-t'>
+                  <div className='flex flex-col space-y-2'>
+                    <SignInButton mode='modal'>
+                      <Button variant='outline' className='w-full'>
+                        Sign In
+                      </Button>
+                    </SignInButton>
+                    <SignUpButton mode='modal'>
+                      <Button className='w-full'>Sign Up</Button>
+                    </SignUpButton>
+                  </div>
+                </div>
+              )}
             </nav>
           </div>
         )}
